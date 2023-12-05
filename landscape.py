@@ -19,7 +19,7 @@ class Tile:
             if self.isMine:
                 return "⛝"
             else:
-                return "◻"
+                return str(self.surrMines)
         elif self.flagged:
             return "▣"
         else:
@@ -49,29 +49,67 @@ class SweepLand:
             
             self.tiles.append(tmp_tiles)
 
-    def anyMines(self):
-        # iterate over whole board
-        # check if all mines are still not clicked
-        # Check if all mines are flagged
-        pass
-
     def getMines(self):
-        mineCoordList = []
+        mineCoordList: list[tuple] = []
         for x in range(self.x):
             for y in range(self.y):
                 if self.tiles[x][y].isMine == True:
                     mineCoordList.append((x, y))
         
         return mineCoordList
+    
+    def proxMines(self):
+        mineList = self.getMines()
+
+        for mine in mineList:
+            # Setting Mine Directions
+            dirs = ['N', 'S', 'E', 'W', 'NE', 'NW', 'SE', 'SW']
+
+            if mine[0] == 0:
+                dirs.remove('W')
+            elif mine[0] == self.x - 1:
+                dirs.remove('E')
+
+            if mine[1] == 0:
+                dirs.remove('NE')
+                dirs.remove('N')
+                dirs.remove('NW')
+            elif mine[1] == self.y - 1:
+                dirs.remove('S')
+                dirs.remove('SE')
+                dirs.remove('SW')
+
+            for dir in dirs:
+                if dir == 'N':
+                    self.tiles[mine[0]][mine[1] - 1].surrMines += 1
+
+                if dir == 'S':
+                    self.tiles[mine[0]][mine[1] + 1].surrMines += 1
+
+                if dir == 'E':
+                    self.tiles[mine[0] + 1][mine[1]].surrMines += 1
+
+                if dir == 'W':
+                    self.tiles[mine[0] - 1][mine[1]].surrMines += 1
+
+                if dir == 'NE':
+                    self.tiles[mine[0] + 1][mine[1] - 1].surrMines += 1
+
+                if dir == 'NW':
+                    self.tiles[mine[0] - 1][mine[1] -1].surrMines += 1
+
+                if dir == 'SE':
+                    self.tiles[mine[0] + 1][mine[1] + 1].surrMines += 1
+
+                if dir == 'SW':
+                    self.tiles[mine[0] - 1][mine[1] + 1].surrMines += 1
 
 
     def sweep(self):
         over: bool = False
+        flagged: list = []
 
-        mineList = self.getMines()
-
-        for mine in mineList:
-            print(mine)
+        self.proxMines()
 
         while(not over):
             coord = tuple(input('Coordinates of Tile (0 Index) and state (C or F): ').split())
@@ -80,19 +118,19 @@ class SweepLand:
 
             if coord[2] == 'C':
                 tile.click()
+                if tile.isMine:
+                    over = True
+                    print("Game Over, Stepped on a Mine.")
             elif coord[2] == 'F':
                 tile.flag()
 
             print(self)
-
-            if tile.isMine:
-                over = True
-                print("Game Over, Stepped on a Mine.")
+            
     
     def __str__(self) -> str:
         return str('\n'.join([' '.join([str(cell) for cell in row]) for row in self.tiles]))
 
-test_board = SweepLand(15, 15, 0.1)
+test_board = SweepLand(4, 4, 1)
 
 print(test_board)
 
