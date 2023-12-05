@@ -4,7 +4,6 @@
 # Tiles to be put within the land
 import random
 
-
 class Tile:
     isMine:   bool = False
     clicked:  bool = False
@@ -101,33 +100,39 @@ class SweepLand:
                     if self.valid(mine[0] + 1, mine[1] + 1):
                         self.tiles[mine[0] + 1][mine[1] + 1].surrMines += 1
 
-
     def sweep(self):
         over: bool = False
-        flagged: list = []
+        flagged: set = set()
+        mines: set = self.getMines()
 
         self.proxMines()
 
         while(not over):
             coord = tuple(input('Coordinates of Tile (0 Index) and state (C or F): ').split())
 
-            tile = self.tiles[int(coord[1])][int(coord[0])]
+            tile = self.tiles[int(coord[0])][int(coord[1])]
 
             if coord[2] == 'C':
                 tile.click()
+
                 if tile.isMine:
                     over = True
                     print("Game Over, Stepped on a Mine.")
             elif coord[2] == 'F':
                 tile.flag()
+                flagged.add((int(coord[0]), int(coord[1])))
 
             print(self)
+
+            if set(mines) == set(flagged):
+                over = True
+                print("GG, Game over and you've won.")
             
     
     def __str__(self) -> str:
         return str('\n'.join([' '.join([str(cell) for cell in row]) for row in self.tiles]))
 
-test_board = SweepLand(4, 4, 1)
+test_board = SweepLand(2, 2, 1)
 
 print(test_board)
 
