@@ -58,6 +58,9 @@ class SweepLand:
         
         return mineCoordList
     
+    def valid(self, x, y):
+        return (0 <= x < self.x) and (0 <= y < self.y)
+    
     def proxMines(self):
         mineList = self.getMines()
 
@@ -65,44 +68,38 @@ class SweepLand:
             # Setting Mine Directions
             dirs = ['N', 'S', 'E', 'W', 'NE', 'NW', 'SE', 'SW']
 
-            if mine[0] == 0:
-                dirs.remove('W')
-            elif mine[0] == self.x - 1:
-                dirs.remove('E')
-
-            if mine[1] == 0:
-                dirs.remove('NE')
-                dirs.remove('N')
-                dirs.remove('NW')
-            elif mine[1] == self.y - 1:
-                dirs.remove('S')
-                dirs.remove('SE')
-                dirs.remove('SW')
-
             for dir in dirs:
                 if dir == 'N':
-                    self.tiles[mine[0]][mine[1] - 1].surrMines += 1
+                    if self.valid(mine[0], mine[1] - 1):
+                        self.tiles[mine[0]][mine[1] - 1].surrMines += 1
 
                 if dir == 'S':
-                    self.tiles[mine[0]][mine[1] + 1].surrMines += 1
+                    if self.valid(mine[0], mine[1] + 1):
+                        self.tiles[mine[0]][mine[1] + 1].surrMines += 1
 
                 if dir == 'E':
-                    self.tiles[mine[0] + 1][mine[1]].surrMines += 1
+                    if self.valid(mine[0] + 1, mine[1]):
+                        self.tiles[mine[0] + 1][mine[1]].surrMines += 1
 
                 if dir == 'W':
-                    self.tiles[mine[0] - 1][mine[1]].surrMines += 1
+                    if self.valid(mine[0] - 1, mine[1]):
+                        self.tiles[mine[0] - 1][mine[1]].surrMines += 1
 
                 if dir == 'NE':
-                    self.tiles[mine[0] + 1][mine[1] - 1].surrMines += 1
+                    if self.valid(mine[0] + 1, mine[1] - 1):
+                        self.tiles[mine[0] + 1][mine[1] - 1].surrMines += 1
 
                 if dir == 'NW':
-                    self.tiles[mine[0] - 1][mine[1] -1].surrMines += 1
-
-                if dir == 'SE':
-                    self.tiles[mine[0] + 1][mine[1] + 1].surrMines += 1
+                    if self.valid(mine[0] - 1, mine[1] - 1):
+                        self.tiles[mine[0] - 1][mine[1] - 1].surrMines += 1
 
                 if dir == 'SW':
-                    self.tiles[mine[0] - 1][mine[1] + 1].surrMines += 1
+                    if self.valid(mine[0] - 1, mine[1] + 1):
+                        self.tiles[mine[0] - 1][mine[1] + 1].surrMines += 1
+
+                if dir == 'SE':
+                    if self.valid(mine[0] + 1, mine[1] + 1):
+                        self.tiles[mine[0] + 1][mine[1] + 1].surrMines += 1
 
 
     def sweep(self):
