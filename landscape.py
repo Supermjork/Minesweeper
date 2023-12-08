@@ -49,19 +49,22 @@ class SweepLand:
             self.tiles.append(tmp_tiles)
 
     def getMines(self):
-        mineCoordList: list[tuple] = []
+        mineCoordList: set = set()
+        emptyCoordList: set = set()
         for x in range(self.x):
             for y in range(self.y):
                 if self.tiles[x][y].isMine == True:
-                    mineCoordList.append((x, y))
+                    mineCoordList.add((x, y))
+                else:
+                    emptyCoordList.add((x, y))
         
-        return mineCoordList
+        return mineCoordList, emptyCoordList
     
     def valid(self, x, y):
         return (0 <= x < self.x) and (0 <= y < self.y)
     
     def proxMines(self):
-        mineList = self.getMines()
+        mineList = self.getMines()[0]
 
         for mine in mineList:
             # Setting Mine Directions
@@ -103,7 +106,8 @@ class SweepLand:
     def sweep(self):
         over: bool = False
         flagged: set = set()
-        mines: set = self.getMines()
+        mines, empty = self.getMines()
+        empty_compare: set = set()
 
         self.proxMines()
 
@@ -112,19 +116,20 @@ class SweepLand:
 
             tile = self.tiles[int(coord[0])][int(coord[1])]
 
-            if coord[2] == 'C':
+            if coord[2].lower() == 'c':
                 tile.click()
+                empty_compare.add((int(coord[0]), int(coord[1])))
 
                 if tile.isMine:
                     over = True
                     print("Game Over, Stepped on a Mine.")
-            elif coord[2] == 'F':
+            elif coord[2].lower() == 'c':
                 tile.flag()
                 flagged.add((int(coord[0]), int(coord[1])))
 
             print(self)
 
-            if set(mines) == set(flagged):
+            if (set(mines) == set(flagged)) and (set(empty) == set(empty_compare)) :
                 over = True
                 print("GG, Game over and you've won.")
             
@@ -132,7 +137,7 @@ class SweepLand:
     def __str__(self) -> str:
         return str('\n'.join([' '.join([str(cell) for cell in row]) for row in self.tiles]))
 
-test_board = SweepLand(2, 2, 1)
+test_board = SweepLand(6, 6, 0.4)
 
 print(test_board)
 
