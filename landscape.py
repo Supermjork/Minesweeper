@@ -123,7 +123,7 @@ class SweepLand:
                 if tile.isMine:
                     over = True
                     print("Game Over, Stepped on a Mine.")
-            elif coord[2].lower() == 'c':
+            elif coord[2].lower() == 'f':
                 tile.flag()
                 flagged.add((int(coord[0]), int(coord[1])))
 
@@ -187,6 +187,6 @@ class SweepLand:
                 print("Solver cannot make progress. The puzzle may be unsolvable.")
 
 
-test_board = SweepLand(6, 6, 0.4)
+test_board = SweepLand(6, 6, 0.1)
 
 test_board.solve()
