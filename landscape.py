@@ -123,7 +123,7 @@ class SweepLand:
                 if tile.isMine:
                     over = True
                     print("Game Over, Stepped on a Mine.")
-            elif coord[2].lower() == 'c':
+            elif coord[2].lower() == 'f':
                 tile.flag()
                 flagged.add((int(coord[0]), int(coord[1])))
 
@@ -137,8 +137,56 @@ class SweepLand:
     def __str__(self) -> str:
         return str('\n'.join([' '.join([str(cell) for cell in row]) for row in self.tiles]))
 
-test_board = SweepLand(6, 6, 0.4)
+    def dfs(self, x, y):
+        if not self.valid(x, y) or self.tiles[x][y].clicked or self.tiles[x][y].flagged:
+            return
 
-print(test_board)
+        self.tiles[x][y].click()
 
-test_board.sweep()
+        if self.tiles[x][y].surrMines == 0:
+            # Recursive DFS for neighboring tiles
+            for dx in range(-1, 2):
+                for dy in range(-1, 2):
+                    nx, ny = x + dx, y + dy
+                    if self.valid(nx, ny):
+                        self.dfs(nx, ny)
+
+    def solve(self):
+        over = False
+        mines, empty = self.getMines()
+        flagged = set()
+
+        self.proxMines()
+
+        while not over:
+            updated = False
+
+            for x in range(self.x):
+                for y in range(self.y):
+                    tile = self.tiles[x][y]
+
+                    if not tile.clicked and not tile.flagged:
+                        if tile.isMine:
+                            print(f"Stepped on a Mine at ({x}, {y}). Returning to previous state.")
+                        else:
+                            self.dfs(x, y)
+                            updated = True
+
+                        if tile.isMine and not tile.flagged:
+                            tile.flag()
+                            flagged.add((x, y))
+
+            print(self)
+
+            if set(mines) == set(flagged) and set(empty) == set(self.getMines()[1]):
+                over = True
+                print("GG, you've won.")
+            
+            if not updated:
+                # No updates were made, and the game is not over
+                print("Solver cannot make progress. The puzzle may be unsolvable.")
+
+
+test_board = SweepLand(6, 6, 0.1)
+
+test_board.solve()
